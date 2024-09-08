@@ -11,7 +11,7 @@ import (
 	"time"
 	"webapp/global"
 	"webapp/logger"
-	"webapp/mysql"
+	"webapp/dao/mysql"
 	"webapp/pkg/snowflake"
 	"webapp/routers"
 	"webapp/settings"

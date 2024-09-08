@@ -1,13 +1,18 @@
 package routers
 
 import (
+	"webapp/controllers"
+
 	"github.com/gin-gonic/gin"
 )
 
 func Setup() *gin.Engine {
 	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.String(20, "ok")
+	// 注册业务路由
+	r.POST("/signup", controllers.SignUphandler)
+	// 测试路由
+	r.GET("/ping", func(c *gin.Context) {
+		c.String(200, "pong")
 	})
 	return r
 }
