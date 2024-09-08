@@ -39,7 +39,7 @@ func Init() *Snowflake {
 	}
 	return snflk
 }
-func (s *Snowflake) GetID() int64 {
+func (s *Snowflake) GetID() int {
 	s.Lock()
 	now := time.Now().UnixNano() / 1000000 // 转毫秒
 	if s.timestamp == now {
@@ -63,7 +63,7 @@ func (s *Snowflake) GetID() int64 {
 		return 0
 	}
 	s.timestamp = now
-	id := int64((t)<<timestampShift | (s.datacenterid << datacenteridShift) | (s.workerid << workeridShift) | (s.sequence))
+	id := int((t)<<timestampShift | (s.datacenterid << datacenteridShift) | (s.workerid << workeridShift) | (s.sequence))
 	s.Unlock()
 	return id
 }

@@ -1,17 +1,34 @@
 package logic
 
 import (
+	"errors"
 	"webapp/dao/mysql"
 	"webapp/global"
 	"webapp/models"
 )
 
-func SignUp(ps *models.ParamSignUp) {
+func SignUp(ps *models.ParamSignUp) error {
 	// 判断用户名是否可用
-	mysql.QueryUserByUsername()
+	ok, err := mysql.CheckUserExist(ps.Username)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return errors.New("用户已存在,请换个用户名")
+	}
 	// 生成UID
-	global.Snflk.GetID()
+	userID := global.Snflk.GetID()
+	// 构造一个User实例，插入数据库
+	u := models.User{
+		UserID:   userID,
+		Username: ps.Username,
+		Password: ps.Password,
+	}
 	// 用户密码加密
 	// 保存进数据库
-	mysql.InsertUser()
+	err = mysql.InsertUser(&u)
+	if err != nil {
+		return err
+	}
+	return nil
 }
