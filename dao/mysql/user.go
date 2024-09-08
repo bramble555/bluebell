@@ -21,7 +21,7 @@ func CheckUserExist(username string) (bool, error) {
 	return count > 0, nil
 }
 func InsertUser(u *models.User) error {
-	sqlStr := "INSERT INTO user (user_id,username,password) VALUES (?,?,?)"
+	sqlStr := "INSERT INTO `user` (user_id,username,password) VALUES (?,?,?)"
 	var count int64
 	res, err := global.DB.Exec(sqlStr, u.UserID, u.Username, u.Password)
 	if err != nil {
