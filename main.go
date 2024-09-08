@@ -12,6 +12,7 @@ import (
 	"webapp/global"
 	"webapp/logger"
 	"webapp/mysql"
+	"webapp/pkg/snowflake"
 	"webapp/routers"
 	"webapp/settings"
 
@@ -38,6 +39,8 @@ func main() {
 	global.DB.SetMaxOpenConns(200)
 	global.DB.SetMaxIdleConns(10)
 	defer global.DB.Close()
+	// 初始化雪花算法生成ID
+	global.Snflk = snowflake.Init()
 	// 注册路由
 	r := routers.Setup()
 	// 优雅关机
