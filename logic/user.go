@@ -47,7 +47,7 @@ func Login(pl *models.ParamLogin) error {
 		return err
 	}
 	if !ok {
-		return errors.New("用户名或密码错误")
+		return errors.New("用户名不存在")
 	}
 	// 判断密码是否错误
 	hashedPassword, err := mysql.QueryPassword(pl)
@@ -58,7 +58,7 @@ func Login(pl *models.ParamLogin) error {
 	if err != nil {
 		// 密码不一致的错误
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return errors.New("用户名或密码错误")
+			return errors.New("密码错误")
 		}
 		// 其他错误
 		return err

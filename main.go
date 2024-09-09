@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"webapp/dao/mysql"
 	"webapp/global"
 	"webapp/logger"
-	"webapp/dao/mysql"
 	"webapp/pkg/snowflake"
 	"webapp/routers"
 	"webapp/settings"
@@ -42,7 +42,7 @@ func main() {
 	// 初始化雪花算法生成ID
 	global.Snflk = snowflake.Init()
 	// 注册路由
-	r := routers.Setup()
+	r := routers.SetupRounter(viper.GetString("app.mode"))
 	// 优雅关机
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", viper.GetString("app.port")),
