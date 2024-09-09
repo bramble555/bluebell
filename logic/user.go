@@ -40,7 +40,31 @@ func SignUp(ps *models.ParamSignUp) error {
 	}
 	return nil
 }
-
+func Login(pl *models.ParamLogin) error {
+	// 判断用户名是否存在
+	ok, err := mysql.CheckUserExist(pl.Username)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("用户名或密码错误")
+	}
+	// 判断密码是否错误
+	hashedPassword, err := mysql.QueryPassword(pl)
+	if err != nil {
+		return err
+	}
+	err = comparePasswords(hashedPassword, pl.Password)
+	if err != nil {
+		// 密码不一致的错误
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return errors.New("用户名或密码错误")
+		}
+		// 其他错误
+		return err
+	}
+	return nil
+}
 func hashPassword(password string) (string, error) {
 	// 使用bcrypt库的GenerateFromPassword函数进行哈希处理
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -48,4 +72,9 @@ func hashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedPassword), nil
+}
+func comparePasswords(hashedPassword, inputPassword string) error {
+	// 使用bcrypt库的CompareHashAndPassword函数比较密码
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword))
+	return err
 }
