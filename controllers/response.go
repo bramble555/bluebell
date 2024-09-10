@@ -19,6 +19,9 @@ const (
 	CodeUserNotExist
 	CodeInvalidPassword
 	CodeServerBusy // 连接不上数据库
+
+	CodeNeedLogin
+	CodeInvalidAuth
 )
 
 var codeMsgMap = map[resCode]string{
@@ -28,6 +31,8 @@ var codeMsgMap = map[resCode]string{
 	CodeUserNotExist:    "用户不存在",
 	CodeInvalidPassword: "用户名或者密码错误",
 	CodeServerBusy:      "服务器繁忙",
+	CodeNeedLogin:       "用户请登录",
+	CodeInvalidAuth:     "token无效",
 }
 
 type ResponseData struct {

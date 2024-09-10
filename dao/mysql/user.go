@@ -36,10 +36,10 @@ func InsertUser(u *models.User) error {
 	}
 	return nil
 }
-func QueryPassword(u *models.ParamLogin) (string, error) {
+func QueryPassword(u *models.User) (string, error) {
 	var encryPassword string
-	sqlStr := "select password  from `user` where username = ?"
-	err := global.DB.QueryRow(sqlStr, u.Username).Scan(&encryPassword)
+	sqlStr := "select user_id,password  from `user` where username = ?"
+	err := global.DB.QueryRow(sqlStr, u.Username).Scan(&u.UserID, &encryPassword)
 	if err != nil {
 		return "", err
 	}

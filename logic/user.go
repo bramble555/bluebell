@@ -5,6 +5,7 @@ import (
 	"webapp/dao/mysql"
 	"webapp/global"
 	"webapp/models"
+	"webapp/pkg/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -40,30 +41,35 @@ func SignUp(ps *models.ParamSignUp) error {
 	}
 	return nil
 }
-func Login(pl *models.ParamLogin) error {
+func Login(pl *models.ParamLogin) (string, error) {
 	// 判断用户名是否存在
-	ok, err := mysql.CheckUserExist(pl.Username)
+	u := &models.User{
+		Username: pl.Username,
+		Password: pl.Password,
+	}
+	ok, err := mysql.CheckUserExist(u.Username)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !ok {
-		return errors.New("用户名不存在")
+		return "", errors.New("用户名不存在")
 	}
 	// 判断密码是否错误
-	hashedPassword, err := mysql.QueryPassword(pl)
+	hashedPassword, err := mysql.QueryPassword(u)
 	if err != nil {
-		return err
+		return "", err
 	}
-	err = comparePasswords(hashedPassword, pl.Password)
+	err = comparePasswords(hashedPassword, u.Password)
 	if err != nil {
 		// 密码不一致的错误
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return errors.New("密码错误")
+			return "", errors.New("密码错误")
 		}
 		// 其他错误
-		return err
+		return "", err
 	}
-	return nil
+	// 用户名和密码都正确，生成token
+	return jwt.GenToken(u.UserID)
 }
 func hashPassword(password string) (string, error) {
 	// 使用bcrypt库的GenerateFromPassword函数进行哈希处理

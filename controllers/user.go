@@ -46,7 +46,7 @@ func Loginhandler(c *gin.Context) {
 		return
 	}
 	// 业务处理
-	err = logic.Login(pl)
+	token, err := logic.Login(pl)
 	if err != nil {
 		global.Log.Error("Login with invaild params")
 		if err == errors.New("用户名不存在") {
@@ -61,5 +61,5 @@ func Loginhandler(c *gin.Context) {
 		}
 	}
 	// 返回响应
-	ResponseSucceed(c, "succeed login")
+	ResponseSucceed(c, token)
 }

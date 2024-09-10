@@ -10,6 +10,6 @@ type ParamSignUp struct {
 
 // ParamLogin 登录请求参数
 type ParamLogin struct {
-	Username string `json:"username" binding:"required,min=3"`
-	Password string `json:"password" binding:"required,min=6"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
