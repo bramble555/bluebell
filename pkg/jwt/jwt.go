@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const TokeExpireDuration = time.Hour * 2
+const TokeExpireDuration = time.Minute * 1
 
 var mySecret = []byte("这是你我的秘密")
 
@@ -38,10 +38,10 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	// 解析token
 	var mc = new(MyClaims)
 	// 如果是自定义Claim结构体则需要使用 ParseWithClaims 方法
-	token, err := jwt.ParseWithClaims(tokenString, mc, func(token *jwt.Token) (i interface{}, err error) {
-		// 直接使用标准的Claim则可以直接使用Parse方法
-		//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (i interface{}, err error) {
-		return token, nil
+	token, err := jwt.ParseWithClaims(tokenString, mc, func(token *jwt.Token) (interface{}, error) {
+		// 这里是验证签名的密钥，根据你的 JWT 签名算法来设置
+		// 例如，如果你的 JWT 是使用 HS256 签名的，这里应该返回签名的密钥
+		return mySecret, nil
 	})
 	if err != nil {
 		return nil, err
