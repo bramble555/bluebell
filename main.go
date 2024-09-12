@@ -1,6 +1,12 @@
 package main
 
 import (
+	"bluebell/dao/mysql"
+	"bluebell/global"
+	"bluebell/logger"
+	"bluebell/pkg/snowflake"
+	"bluebell/routers"
+	"bluebell/settings"
 	"context"
 	"fmt"
 	"log"
@@ -9,12 +15,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"webapp/dao/mysql"
-	"webapp/global"
-	"webapp/logger"
-	"webapp/pkg/snowflake"
-	"webapp/routers"
-	"webapp/settings"
 
 	"github.com/spf13/viper"
 )

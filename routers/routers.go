@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"webapp/controllers"
-	"webapp/middlewares"
+	"bluebell/controllers"
+	"bluebell/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

@@ -2,10 +2,10 @@ package logic
 
 import (
 	"errors"
-	"webapp/dao/mysql"
-	"webapp/global"
-	"webapp/models"
-	"webapp/pkg/jwt"
+	"bluebell/dao/mysql"
+	"bluebell/global"
+	"bluebell/models"
+	"bluebell/pkg/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )

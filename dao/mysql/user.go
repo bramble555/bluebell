@@ -3,8 +3,8 @@ package mysql
 import (
 	"database/sql"
 	"errors"
-	"webapp/global"
-	"webapp/models"
+	"bluebell/global"
+	"bluebell/models"
 )
 
 func CheckUserExist(username string) (bool, error) {

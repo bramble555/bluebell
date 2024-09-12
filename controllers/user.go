@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"errors"
-	"webapp/global"
-	"webapp/logic"
-	"webapp/models"
+	"bluebell/global"
+	"bluebell/logic"
+	"bluebell/models"
 
 	"github.com/gin-gonic/gin"
 )
