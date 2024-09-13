@@ -13,17 +13,15 @@ func SetupRounter(mode string) *gin.Engine {
 		gin.SetMode(mode)
 	}
 	r := gin.Default()
+	v1 := r.Group("/api/v1")
 	// 注册业务路由
-	r.POST("/signup", controllers.SignUphandler)
+	v1.POST("/signup", controllers.SignUpHandler)
 	// 登录业务路由
-	r.POST("/login", controllers.Loginhandler)
-	// 测试路由
-	r.GET("/ping", middlewares.JWTAuthorMiddleware(), func(c *gin.Context) {
-		// 如果是未登录用户，让他登录
-		c.Request.Header.Get("Authorization")
+	v1.POST("/login", controllers.LoginHandler)
+	// 权限认证
+	v1.Use(middlewares.JWTAuthorMiddleware())
+	// 实现社区功能
+	v1.GET("/community", controllers.CommunityHandler)
 
-		c.String(200, "pong")
-
-	})
 	return r
 }

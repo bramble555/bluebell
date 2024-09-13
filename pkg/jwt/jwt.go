@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const TokeExpireDuration = time.Minute * 1
+const TokeExpireDuration = time.Hour * 10
 
 var mySecret = []byte("这是你我的秘密")
 

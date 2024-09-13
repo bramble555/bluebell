@@ -11,3 +11,24 @@ CREATE TABLE `user` (
 	UNIQUE KEY `idx_username` ( `username` ) USING BTREE,
 	UNIQUE KEY `idx_user_id` ( `user_id` ) USING BTREE
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+CREATE TABLE `community`(
+	`id` BIGINT ( 20 ) NOT NULL auto_increment,-- 防止用户知道我这个项目有多少人注册了
+	`community_id` BIGINT ( 20 ) NOT NULL,
+	`community_name` VARCHAR ( 128 ) NOT NULL,
+	`introduction` VARCHAR ( 64 ) NOT NULL,
+	`create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+	`update_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY ( `id` ),
+	UNIQUE KEY `idx_community_id`(`community_id`),
+	UNIQUE KEY `idx_community_name`(`community_name`)
+)ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+INSERT INTO `community` (`community_id`,community_name,introduction)
+VALUES (1,'Go','Golang');
+INSERT INTO `community` (`community_id`,community_name,introduction)
+VALUES (2,'leetcode','要刷题咯');
+INSERT INTO `community` (`community_id`,community_name,introduction)
+VALUES (3,'LOL','欢迎来到影响联盟');
+INSERT INTO `community` (`community_id`,community_name,introduction)
+VALUES (4,'CF','A小有人');

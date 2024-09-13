@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"errors"
 	"bluebell/global"
 	"bluebell/logic"
 	"bluebell/models"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 )
 
-// SignUphandler 实现注册功能
-func SignUphandler(c *gin.Context) {
+// SignUpHandler 实现注册功能
+func SignUpHandler(c *gin.Context) {
 	// 获取参数并且参数校验
 	ps := new(models.ParamSignUp)
 	if err := c.ShouldBind(ps); err != nil {
@@ -35,8 +35,8 @@ func SignUphandler(c *gin.Context) {
 	ResponseSucceed(c, "succeed singup")
 }
 
-// Loginhandler 实现登录功能
-func Loginhandler(c *gin.Context) {
+// LoginHandler 实现登录功能
+func LoginHandler(c *gin.Context) {
 	// 获取参数并且参数校验
 	pl := new(models.ParamLogin)
 	err := c.ShouldBind(pl)
@@ -63,3 +63,5 @@ func Loginhandler(c *gin.Context) {
 	// 返回响应
 	ResponseSucceed(c, token)
 }
+
+
