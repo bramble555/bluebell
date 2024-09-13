@@ -2,6 +2,7 @@ package snowflake
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -59,7 +60,8 @@ func (s *Snowflake) GetID() int {
 	t := now - epoch
 	if t > timestampMax {
 		s.Unlock()
-		fmt.Errorf("epoch must be between 0 and %d", timestampMax-1)
+		err := fmt.Errorf("epoch must be between 0 and %d", timestampMax-1)
+		log.Println(err)
 		return 0
 	}
 	s.timestamp = now
