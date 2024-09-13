@@ -22,6 +22,6 @@ func SetupRounter(mode string) *gin.Engine {
 	v1.Use(middlewares.JWTAuthorMiddleware())
 	// 实现社区功能
 	v1.GET("/community", controllers.CommunityHandler)
-
+	v1.GET("/community/:id", controllers.CommunityDetailByIDHandler)
 	return r
 }

@@ -22,6 +22,8 @@ const (
 
 	CodeNeedLogin
 	CodeInvalidAuth
+
+	CodeInvalidID
 )
 
 var codeMsgMap = map[resCode]string{
@@ -33,6 +35,7 @@ var codeMsgMap = map[resCode]string{
 	CodeServerBusy:      "服务器繁忙",
 	CodeNeedLogin:       "用户请登录",
 	CodeInvalidAuth:     "token无效",
+	CodeInvalidID:       "无效ID",
 }
 
 type ResponseData struct {

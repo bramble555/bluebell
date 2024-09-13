@@ -1,11 +1,11 @@
 package mysql
 
 import (
+	"bluebell/global"
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"bluebell/global"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
@@ -13,7 +13,7 @@ import (
 
 func Init() (db *sql.DB, err error) {
 	// 连接字符串，也就是数据源
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local",
 		viper.GetString("mysql.user"),
 		viper.GetString("mysql.password"),
 		viper.GetString("mysql.host"),

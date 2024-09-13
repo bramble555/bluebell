@@ -30,3 +30,15 @@ func GetCommunityList() (*[]models.Community, error) {
 	// 返回指向切片的指针（如果需要的话）
 	return &communities, nil
 }
+
+// GetCommunityDetailByID 得到某个社区详情
+func GetCommunityDetailByID(id uint64) (*models.CommunityDetail, error) {
+	var cd = new(models.CommunityDetail)
+	sqlStr := `select community_id, community_name, introduction, create_time from community where community_id = ?`
+	err := global.DB.QueryRow(sqlStr, id).Scan(&cd.ID, &cd.Name, &cd.Introduction, &cd.CreateTime)
+	if err != nil {
+		return nil, err
+	}
+	return cd, nil
+
+}
