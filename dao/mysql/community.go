@@ -3,6 +3,8 @@ package mysql
 import (
 	"bluebell/global"
 	"bluebell/models"
+	"database/sql"
+	"errors"
 )
 
 // GetCommunityList 得到社区列表
@@ -33,12 +35,17 @@ func GetCommunityList() (*[]models.Community, error) {
 
 // GetCommunityDetailByID 得到某个社区详情
 func GetCommunityDetailByID(id uint64) (*models.CommunityDetail, error) {
-	var cd = new(models.CommunityDetail)
-	sqlStr := `select community_id, community_name, introduction, create_time from community where community_id = ?`
+	var cd models.CommunityDetail
+	sqlStr := `SELECT community_id, community_name, introduction, create_time FROM community WHERE community_id = ?`
+
 	err := global.DB.QueryRow(sqlStr, id).Scan(&cd.ID, &cd.Name, &cd.Introduction, &cd.CreateTime)
 	if err != nil {
+		if err == sql.ErrNoRows { // 区分没有数据的情况
+			err = errors.New("无效ID")
+			return nil, err
+		}
 		return nil, err
 	}
-	return cd, nil
 
+	return &cd, nil
 }
