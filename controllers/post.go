@@ -4,6 +4,7 @@ import (
 	"bluebell/global"
 	"bluebell/logic"
 	"bluebell/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,5 +35,27 @@ func CreatePostHandler(c *gin.Context) {
 	}
 
 	//返回响应
-	ResponseSucceed(c,CodeSucceed)
+	ResponseSucceed(c, CodeSucceed)
+}
+
+func GetPostDetailHandler(c *gin.Context) {
+	// 获取参数(从URL中获取帖子的ID)
+	p := new(models.Post)
+	pid := c.Param("id")
+	id, err := strconv.ParseInt(pid, 10, 64)
+	p.PostID = int(id)
+	if err != nil {
+		global.Log.Errorln("Params error", err.Error())
+		ResponseError(c, CodeInvalidParam)
+		return
+	}
+	// 根据id取出帖子数据
+	err = logic.GetPostDetail(p)
+	if err != nil {
+		global.Log.Errorln("logic.GetPostDetail error", err.Error())
+		ResponseError(c, CodeInvalidParam)
+		return
+	}
+	// 返回响应
+	ResponseSucceed(c, p)
 }

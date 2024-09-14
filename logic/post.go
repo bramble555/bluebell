@@ -11,3 +11,7 @@ func CreatePost(p *models.Post) error {
 	p.PostID = global.Snflk.GetID()
 	return mysql.CreatePost(p)
 }
+
+func GetPostDetail(p *models.Post) error {
+	return mysql.GetPostDetail(p)
+}
