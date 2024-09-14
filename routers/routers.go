@@ -23,5 +23,6 @@ func SetupRounter(mode string) *gin.Engine {
 	// 实现社区功能
 	v1.GET("/community", controllers.CommunityHandler)
 	v1.GET("/community/:id", controllers.CommunityDetailByIDHandler)
+	v1.POST("/post", controllers.CreatePostHandler)
 	return r
 }

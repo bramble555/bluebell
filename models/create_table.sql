@@ -40,7 +40,7 @@ CREATE TABLE `post` (
 	`content` TEXT not null,
 	`author_id` BIGINT(20) not null,
 	`community_id` BIGINT(20) not null,
-	`status` TINYINT(1) not null DEFAULT 1,
+	`status` TINYINT(1) not null DEFAULT 1 ,
 	`create_time` TIMESTAMP null DEFAULT CURRENT_TIMESTAMP,
 	`update_time` TIMESTAMP null DEFAULT CURRENT_TIMESTAMP on UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`),
