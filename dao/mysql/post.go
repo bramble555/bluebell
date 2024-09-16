@@ -10,7 +10,7 @@ func CreatePost(p *models.Post) error {
 	post_id,title,content,author_id,community_id
 	) values (?,?,?,?,?)
 	`
-	_, err := global.DB.Exec(sqlStr, p.PostID, p.Title, p.Content, p.AuthorID, p.CommunityID)
+	_, err := global.DB.Exec(sqlStr, p.PostID, p.Title, p.Content, p.UserID, p.CommunityID)
 	return err
 }
 
@@ -21,7 +21,7 @@ func GetPostDetail(p *models.Post) error {
 	`
 	return global.DB.QueryRow(sqlStr, p.PostID).Scan(
 		&p.PostID,
-		&p.AuthorID,
+		&p.UserID,
 		&p.CommunityID,
 		&p.Title,
 		&p.Content,

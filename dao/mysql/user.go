@@ -1,10 +1,10 @@
 package mysql
 
 import (
-	"database/sql"
-	"errors"
 	"bluebell/global"
 	"bluebell/models"
+	"database/sql"
+	"errors"
 )
 
 func CheckUserExist(username string) (bool, error) {
@@ -44,4 +44,10 @@ func QueryPassword(u *models.User) (string, error) {
 		return "", err
 	}
 	return encryPassword, nil
+}
+func GetUserDetail(id int) (*models.UserDetail, error) {
+	ud := new(models.UserDetail)
+	sqlStr := `select user_id, username from user where user_id = ?`
+	err := global.DB.QueryRow(sqlStr, id).Scan(&ud.UserID, &ud.Username)
+	return ud, err
 }

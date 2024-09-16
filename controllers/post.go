@@ -21,7 +21,7 @@ func CreatePostHandler(c *gin.Context) {
 	// 创建帖子
 
 	// 获取p的作者ID,也就是当前用户ID
-	p.AuthorID, err = getCurUserID(c)
+	p.UserID, err = getCurUserID(c)
 	if err != nil {
 		global.Log.Errorln("logic CreatePost err", err.Error())
 		ResponseError(c, CodeNeedLogin)
@@ -50,12 +50,12 @@ func GetPostDetailHandler(c *gin.Context) {
 		return
 	}
 	// 根据id取出帖子数据
-	err = logic.GetPostDetail(p)
+	pd, err := logic.GetPostDetail(p)
 	if err != nil {
 		global.Log.Errorln("logic.GetPostDetail error", err.Error())
 		ResponseError(c, CodeInvalidParam)
 		return
 	}
 	// 返回响应
-	ResponseSucceed(c, p)
+	ResponseSucceed(c, pd)
 }

@@ -29,7 +29,7 @@ func CommunityDetailByIDHandler(c *gin.Context) {
 		ResponseError(c, CodeInvalidID)
 		return
 	}
-	communityList, err := logic.GetCommunityDetailByID(ID)
+	communityList, err := logic.GetCommunityDetailByID(int(ID))
 	if err != nil {
 		global.Log.Error("logic.GetCommunityDetailByID() failed", err.Error())
 		ResponseError(c, CodeInvalidID)
