@@ -59,3 +59,30 @@ func GetPostDetailHandler(c *gin.Context) {
 	// 返回响应
 	ResponseSucceed(c, pd)
 }
+
+// GetPostListHandler 实现Post列表查询
+func GetPostListHandler(c *gin.Context) {
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
+	var page int
+	page64, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil {
+		global.Log.Errorln("controller page error", err.Error())
+		page64 = 0
+	}
+	page = int(page64)
+	var size int
+	size64, err := strconv.ParseInt(sizeStr, 10, 64)
+	if err != nil {
+		global.Log.Errorln("controller size error", err.Error())
+		page64 = 2
+	}
+	size = int(size64)
+	data, err := logic.GetPostList(page, size)
+	if err != nil {
+		global.Log.Errorln("logic GetPostList error", err.Error())
+		ResponseError(c, CodeInvalidParam)
+		return
+	}
+	ResponseSucceed(c, data)
+}

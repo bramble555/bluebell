@@ -38,13 +38,13 @@ CREATE TABLE `post` (
 	`post_id` BIGINT(20) not null,
 	`title` VARCHAR(128) not null,
 	`content` TEXT not null,
-	`author_id` BIGINT(20) not null,
+	`user_id` BIGINT(20) not null,
 	`community_id` BIGINT(20) not null,
 	`status` TINYINT(1) not null DEFAULT 1 ,
 	`create_time` TIMESTAMP null DEFAULT CURRENT_TIMESTAMP,
 	`update_time` TIMESTAMP null DEFAULT CURRENT_TIMESTAMP on UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `idx_post_id`(`post_id`),
-	KEY `idx_author_id` (`author_id`),
+	KEY `idx_user_id` (`user_id`),
 	KEY `idx_community_id` (`community_id`)
 )ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;

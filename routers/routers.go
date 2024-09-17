@@ -25,5 +25,6 @@ func SetupRounter(mode string) *gin.Engine {
 	v1.GET("/community/:id", controllers.CommunityDetailByIDHandler)
 	v1.POST("/post", controllers.CreatePostHandler)
 	v1.GET("/post/:id", controllers.GetPostDetailHandler)
+	v1.GET("/posts", controllers.GetPostListHandler)
 	return r
 }
