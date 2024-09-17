@@ -7,6 +7,6 @@ type User struct {
 }
 
 type UserDetail struct {
-	UserID   int    `json:"user_id" db:"user_id"`
+	UserID   int    `json:"user_id,string" db:"user_id"`
 	Username string `json:"username" db:"username"`
 }

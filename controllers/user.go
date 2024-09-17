@@ -61,7 +61,13 @@ func LoginHandler(c *gin.Context) {
 		}
 	}
 	// 返回响应
-	ResponseSucceed(c, token)
+	type data struct {
+		Token    string 
+		UserName string
+	}
+	d := &data{
+		Token:    token,
+		UserName: pl.Username,
+	}
+	ResponseSucceed(c, d)
 }
-
-
