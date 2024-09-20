@@ -18,3 +18,9 @@ mysql:
   dbname: "bluebell"
 
 # redis未写
+redis: 
+  host: "127.0.0.1"
+  prot: "6379"
+  password : "123456"
+  db: 0
+  pool_size: 100

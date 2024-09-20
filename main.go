@@ -2,6 +2,7 @@ package main
 
 import (
 	"bluebell/dao/mysql"
+	"bluebell/dao/redis"
 	"bluebell/global"
 	"bluebell/logger"
 	"bluebell/pkg/snowflake"
@@ -39,6 +40,12 @@ func main() {
 	global.DB.SetMaxOpenConns(200)
 	global.DB.SetMaxIdleConns(10)
 	defer global.DB.Close()
+	// 初始化redis
+	global.RDB, err = redis.Init()
+	if err != nil {
+		global.Log.Printf("init redis failed, err:%v\n", err)
+		return
+	}
 	// 初始化雪花算法生成ID
 	global.Snflk = snowflake.Init()
 	// 注册路由
