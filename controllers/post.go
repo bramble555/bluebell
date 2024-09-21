@@ -86,3 +86,15 @@ func GetPostListHandler(c *gin.Context) {
 	}
 	ResponseSucceed(c, data)
 }
+
+// PostVoteHandler 实现帖子投票功能
+func PostVoteHandler(c *gin.Context) {
+	// 参数校验
+	pv := new(models.ParamPostVote)
+	err := c.ShouldBindJSON(pv)
+	if err != nil {
+		ResponseErrorWithData(c, 200, err.Error())
+		return
+	}
+	ResponseSucceed(c, pv)
+}
