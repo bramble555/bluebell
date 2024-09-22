@@ -93,8 +93,24 @@ func PostVoteHandler(c *gin.Context) {
 	pv := new(models.ParamPostVote)
 	err := c.ShouldBindJSON(pv)
 	if err != nil {
+		global.Log.Errorln("controller PostVoteHandler err", err.Error())
 		ResponseErrorWithData(c, 200, err.Error())
 		return
 	}
+	userID, err := getCurUserID(c)
+	if err != nil {
+		global.Log.Errorln("controller getCurUserID err", err.Error())
+		ResponseErrorWithData(c, 200, err.Error())
+		return
+	}
+	// 逻辑处理
+	err = logic.VoteForPost(userID, pv)
+	if err != nil {
+		global.Log.Errorln("logic VoteForPost err", err.Error())
+		ResponseErrorWithData(c, 200, err.Error())
+		return
+	}
+	// 返回响应
 	ResponseSucceed(c, pv)
+
 }

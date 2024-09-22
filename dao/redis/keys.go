@@ -8,3 +8,7 @@ const (
 	KeyZSetPostScore   = "post:score"  // 帖子及投票分数
 	KeyZSetPostVotedPF = "post:voted:" // 记录用户及投票类型；参数是post_id
 )
+
+func getKeyName(key string) string {
+	return KeyPrefix + key
+}

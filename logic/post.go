@@ -2,6 +2,7 @@ package logic
 
 import (
 	"bluebell/dao/mysql"
+	"bluebell/dao/redis"
 	"bluebell/global"
 	"bluebell/models"
 )
@@ -9,7 +10,17 @@ import (
 func CreatePost(p *models.Post) error {
 	// 根据雪花算法获取postID
 	p.PostID = global.Snflk.GetID()
-	return mysql.CreatePost(p)
+	err := mysql.CreatePost(p)
+	if err != nil {
+		global.Log.Errorln("mysql create post error", err.Error())
+		return err
+	}
+	err = redis.CreatePost(p.PostID)
+	if err != nil {
+		global.Log.Errorln("redis create post error", err.Error())
+		return err
+	}
+	return nil
 }
 
 func GetPostDetail(p *models.Post) (*models.PostDetail, error) {
@@ -69,4 +80,26 @@ func GetPostList(page, size int) ([]*models.PostDetail, error) {
 		pds = append(pds, pd)
 	}
 	return pds, nil
+}
+
+// 投票有很多算法
+// 本项目采用简单算法，投一票就 + 432 分，86400/200 -> 200张赞成票可以让你的帖子续一天 《redis实战》
+/*
+	投票的几种情况
+	direction = 1：	之前没有投票，现在点赞	+ 432
+			之前反对，现在点赞	+ 432 * 2
+	direction = 0: 	之前点赞，现在取消	- 432
+			之前反对，现在取消	+ 432
+	direction = -1:	之前没有投票，现在反对 	-432
+			之前点赞，现在反对	-432*2
+*/
+// curDirection > preDirection + 绝对值(curDirection - preDirection)
+// curDirection < preDirection - 绝对值(curDirection - preDirection)
+
+// 投票限制：每个帖子自发表之日后一星期，就不允许点赞和反对了
+// 到期之后存入 MySQL ，然后删除 redis 保存的KeyZSetPostVotedPF
+
+func VoteForPost(userID int, pv *models.ParamPostVote) error {
+	global.Log.Debugln("uid", userID, "pid", pv.PostID, "正在投票，方向是", pv.Direction)
+	return redis.VoteForPost(userID, pv.PostID, float64(pv.Direction))
 }
