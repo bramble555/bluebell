@@ -5,6 +5,7 @@ import (
 	"bluebell/dao/redis"
 	"bluebell/global"
 	"bluebell/models"
+	"errors"
 )
 
 func CreatePost(p *models.Post) error {
@@ -81,6 +82,44 @@ func GetPostList(page, size int) ([]*models.PostDetail, error) {
 	}
 	return pds, nil
 }
+func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
+	idList, err := redis.GetPostIDList2(ppl)
+	if err != nil {
+		return nil, err
+	}
+	posts, err := mysql.GetPostList2(idList, ppl.Page, ppl.Size)
+	pds := make([]*models.PostDetail, 0, len(idList))
+	global.Log.Debugln("idList长度为", len(idList))
+	if err != nil {
+		return nil, err
+	}
+	global.Log.Debugln("posts为", posts)
+	for _, p := range posts {
+		pd := &models.PostDetail{
+			Username:        "",
+			Post:            p,
+			CommunityDetail: &models.CommunityDetail{},
+		}
+		// 获取社区详情
+		cd, err := mysql.GetCommunityDetailByID(p.CommunityID)
+		if err != nil {
+			global.Log.Errorf("logic GetCommunityDetailByID err community_id是 %d: %v", p.CommunityID, err)
+			return nil, err
+		}
+		pd.CommunityDetail = cd
+		// 获取用户详情
+		ud, err := mysql.GetUserDetail(p.UserID)
+		if err != nil {
+			global.Log.Errorf("logic GetUserDetail err user_id是 %d: %v", p.UserID, err)
+			return nil, err
+		}
+		pd.Username = ud.Username
+		global.Log.Debugf("详细信息为%+v", pd)
+		pds = append(pds, pd)
+	}
+	return pds, nil
+
+}
 
 // 投票有很多算法
 // 本项目采用简单算法，投一票就 + 432 分，86400/200 -> 200张赞成票可以让你的帖子续一天 《redis实战》
@@ -100,6 +139,14 @@ func GetPostList(page, size int) ([]*models.PostDetail, error) {
 // 到期之后存入 MySQL ，然后删除 redis 保存的KeyZSetPostVotedPF
 
 func VoteForPost(userID int, pv *models.ParamPostVote) error {
+	// 判断pid是否存在
+	ok, err := mysql.CheckPIDExist(pv.PostID)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("查询的post_id 不存在")
+	}
 	global.Log.Debugln("uid", userID, "pid", pv.PostID, "正在投票，方向是", pv.Direction)
 	return redis.VoteForPost(userID, pv.PostID, float64(pv.Direction))
 }

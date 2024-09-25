@@ -2,6 +2,7 @@ package redis
 
 import (
 	"bluebell/global"
+	"bluebell/models"
 	"errors"
 	"math"
 	"strconv"
@@ -13,6 +14,8 @@ import (
 const (
 	oneWeekInSeconds         = 7 * 24 * 3600 * 3600
 	perVoteScore     float64 = 432.0 // 每一票值多少分
+	OrderByTime              = "time"
+	OrderByScore             = "score"
 )
 
 var (
@@ -34,6 +37,18 @@ func CreatePost(postID int) error {
 	})
 	_, err := pipe.Exec()
 	return err
+}
+
+func GetPostIDList2(ppl *models.ParamPostList) (res []string, err error) {
+	var strat int64 = int64((ppl.Page - 1) * ppl.Size) // 3 4 start: 2*4=8 end: 8+4-1=11
+	var end int64 = strat + int64(ppl.Size) - 1
+	if ppl.Order == OrderByScore {
+		res, err = global.RDB.ZRange(getKeyName(KeyZSetPostScore), strat, end).Result()
+	} else {
+		res, err = global.RDB.ZRange(getKeyName(KeyZSetPostTime), strat, end).Result()
+	}
+	global.Log.Debugln("id 分别为", res)
+	return res, err
 }
 func VoteForPost(userID int, postID int, curPos float64) error {
 	ui := strconv.Itoa(userID) // userID String 类型
