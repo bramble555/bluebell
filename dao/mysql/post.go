@@ -83,7 +83,7 @@ func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
 	`
 	// 将 idList 转换为逗号分隔的字符串形式
 	idStr := strings.Join(idList, ",")
-	global.Log.Debugln("idstr为", idStr, "页数为", page, "数量为", size)
+	global.Log.Debugln("idstr为", idStr, "页数为", page, "数量为", size, "(page-1)*size为", (page-1)*size)
 	rows, err := global.DB.Query(sqlStr, idStr, idStr, (page-1)*size, size)
 	if err != nil {
 		return nil, err
