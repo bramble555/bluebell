@@ -4,6 +4,7 @@ import (
 	"bluebell/global"
 	"bluebell/models"
 	"database/sql"
+	"fmt"
 	"strings"
 )
 
@@ -73,21 +74,30 @@ func GetPostList(page, size int) ([]*models.Post, error) {
 func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
 	var posts []*models.Post
 	if len(idList) == 0 {
-		return posts, nil
+		return nil, nil
 	}
-	sqlStr := `select post_id, user_id, community_id, title, content, create_time
+	// 使用逗号拼接所有元素
+	idInStr := strings.Join(idList, "','")
+	idOrderStr := strings.Join(idList, ",")
+
+	// 构建 SQL 查询
+	sqlStr := fmt.Sprintf(`select post_id, user_id, community_id, title, content, create_time
 	from post
-	where post_id in (?)
-	order by FIND_IN_SET(post_id,?) 
-	limit ?,?
-	`
-	// 将 idList 转换为逗号分隔的字符串形式
-	idStr := strings.Join(idList, ",")
-	global.Log.Debugln("idstr为", idStr, "页数为", page, "数量为", size, "(page-1)*size为", (page-1)*size)
-	rows, err := global.DB.Query(sqlStr, idStr, idStr, (page-1)*size, size)
+	where post_id in ('%s')
+	order by FIND_IN_SET(post_id,'%s') 
+	limit %d,%d
+	`, idInStr, idOrderStr, (page-1)*size, size)
+	stmt, err := global.DB.Prepare(sqlStr)
 	if err != nil {
+		global.Log.Errorln("db prepare error", err.Error())
 		return nil, err
 	}
+	rows, err := stmt.Query()
+	if err != nil {
+		global.Log.Errorln("db query error", err.Error())
+		return nil, err
+	}
+	global.Log.Debugln("idstr为", idOrderStr, "页数为", page, "数量为", size, "(page-1)*size为", (page-1)*size)
 	defer rows.Close()
 	for rows.Next() {
 		p := &models.Post{}
@@ -95,7 +105,6 @@ func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
 		if err != nil {
 			return nil, err
 		}
-		global.Log.Debugf("post为%+v", p)
 		posts = append(posts, p)
 	}
 	return posts, nil
