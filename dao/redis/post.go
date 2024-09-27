@@ -20,6 +20,7 @@ const (
 
 var (
 	ErrVoteTimeExprie = errors.New("投票时间已经过去")
+	ErrorRepeateVote  = errors.New("请不要重复投票")
 )
 
 // CreatePost 创建帖子的时候向redis里面增加 KeyZSetPostTime 和 KeyZSetPostScore
@@ -63,6 +64,9 @@ func VoteForPost(userID int, postID int, curPos float64) error {
 	// 先获取当前是赞成还是反对
 	prePos := global.RDB.ZScore(getKeyName(KeyZSetPostVotedPF+pi), ui).Val()
 	pos := math.Abs(prePos - curPos)
+	if curPos == prePos { //重复投票
+		return ErrorRepeateVote
+	}
 	var temp float64
 	if curPos > prePos {
 		temp = 1
@@ -87,5 +91,22 @@ func VoteForPost(userID int, postID int, curPos float64) error {
 	}
 	_, err = pipe.Exec()
 	return err
+}
 
+func GetPostApproNum(idList []string) ([]int64, error) {
+	// 使用 pipeline 减少请求次数，减少 RTT
+	pipe := global.RDB.Pipeline()
+	for _, id := range idList {
+		pipe.ZCount(getKeyName(KeyZSetPostVotedPF+id), "1", "1").Result()
+	}
+	cmders, err := pipe.Exec()
+	data := make([]int64, 0, len(cmders))
+	if err != nil {
+		return data, err
+	}
+	for _, comder := range cmders {
+		v := comder.(*redis.IntCmd).Val()
+		data = append(data, v)
+	}
+	return data, err
 }

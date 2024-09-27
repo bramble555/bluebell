@@ -85,12 +85,20 @@ func GetPostList(page, size int) ([]*models.PostDetail, error) {
 func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 	idList, err := redis.GetPostIDList2(ppl)
 	if err != nil {
+		global.Log.Errorf("redis GetPostIDList2 error %s\n", err.Error())
+		return nil, err
+	}
+	// 获取帖子赞同票数
+	approvalNum, err := redis.GetPostApproNum(idList)
+	if err != nil {
+		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
 		return nil, err
 	}
 	posts, err := mysql.GetPostList2(idList, ppl.Page, ppl.Size)
 	pds := make([]*models.PostDetail, 0, len(idList))
 	global.Log.Debugln("idList长度为", len(idList))
 	if err != nil {
+		global.Log.Errorf("mysql GetPostIDList2 error %s\n", err.Error())
 		return nil, err
 	}
 	global.Log.Debugln("posts为", posts)
@@ -99,6 +107,7 @@ func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 			Username:        "",
 			Post:            p,
 			CommunityDetail: &models.CommunityDetail{},
+			ApprovalNum:     approvalNum,
 		}
 		// 获取社区详情
 		cd, err := mysql.GetCommunityDetailByID(p.CommunityID)

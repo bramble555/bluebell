@@ -102,7 +102,7 @@ func GetPostListHandler2(c *gin.Context) {
 	ppl.Size = defaultSize
 	ppl.Order = defaultOrder
 	// 从URL获取参数
-	err := c.ShouldBindQuery(ppl)
+	err := c.ShouldBindQuery(&ppl)
 	if err != nil {
 		global.Log.Errorf("controller GetPostListHandler2 error: %v", err)
 		ResponseErrorWithData(c, CodeInvalidParam, err.Error())
@@ -158,5 +158,4 @@ func PostVoteHandler(c *gin.Context) {
 	}
 	// 返回响应
 	ResponseSucceed(c, pv)
-
 }
