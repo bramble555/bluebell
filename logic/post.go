@@ -16,7 +16,7 @@ func CreatePost(p *models.Post) error {
 		global.Log.Errorln("mysql create post error", err.Error())
 		return err
 	}
-	err = redis.CreatePost(p.PostID)
+	err = redis.CreatePost(p.PostID, p.CommunityID)
 	if err != nil {
 		global.Log.Errorln("redis create post error", err.Error())
 		return err
@@ -53,7 +53,7 @@ func GetPostDetail(p *models.Post) (*models.PostDetail, error) {
 }
 
 func GetPostList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
-	idList, err := redis.GetPostIDList2(ppl)
+	idList, err := redis.GetPostIDList(ppl)
 	if err != nil {
 		global.Log.Errorf("redis GetPostIDList2 error %s\n", err.Error())
 		return nil, err
@@ -64,7 +64,55 @@ func GetPostList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
 		return nil, err
 	}
-	posts, err := mysql.GetPostList2(idList)
+	posts, err := mysql.GetPostList(idList)
+	pds := make([]*models.PostDetail, 0, len(idList))
+	global.Log.Debugln("idList长度为", len(idList))
+	if err != nil {
+		global.Log.Errorf("mysql GetPostIDList2 error %s\n", err.Error())
+		return nil, err
+	}
+	global.Log.Debugln("posts为", posts)
+	for i, p := range posts {
+		pd := &models.PostDetail{
+			Username:              "",
+			Post:                  p,
+			ApprovalNum:           approvalNum[i],
+			CommunityName:         "",
+			CommunityIntroduction: "",
+		}
+		// 获取社区详情
+		cd, err := mysql.GetCommunityDetailByID(p.CommunityID)
+		if err != nil {
+			global.Log.Errorf("logic GetCommunityDetailByID err community_id是 %d: %v", p.CommunityID, err)
+			return nil, err
+		}
+		pd.CommunityIntroduction = cd.Introduction
+		pd.CommunityName = cd.Name
+		// 获取用户详情
+		ud, err := mysql.GetUserDetail(p.UserID)
+		if err != nil {
+			global.Log.Errorf("logic GetUserDetail err user_id是 %d: %v", p.UserID, err)
+			return nil, err
+		}
+		pd.Username = ud.Username
+		global.Log.Debugf("详细信息为%+v", pd)
+		pds = append(pds, pd)
+	}
+	return pds, nil
+}
+func GetPostCommunityList(pcpl *models.ParamCommunityPostList) ([]*models.PostDetail, error) {
+	idList, err := redis.GetCommuntiyPostIDList(pcpl)
+	if err != nil {
+		global.Log.Errorf("redis GetPostIDList2 error %s\n", err.Error())
+		return nil, err
+	}
+	// 获取帖子赞同票数
+	approvalNum, err := redis.GetPostApproNum(idList)
+	if err != nil {
+		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
+		return nil, err
+	}
+	posts, err := mysql.GetPostList(idList)
 	pds := make([]*models.PostDetail, 0, len(idList))
 	global.Log.Debugln("idList长度为", len(idList))
 	if err != nil {

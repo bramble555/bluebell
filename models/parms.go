@@ -26,3 +26,10 @@ type ParamPostList struct {
 	Size  int    `json:"size" form:"size"`
 	Order string `json:"order" form:"order"`
 }
+
+type ParamCommunityPostList struct {
+	ID    int    `json:"communtiy_id,string" form:"communtiy_id" binding:"required"`
+	Page  int    `json:"page" form:"page"`
+	Size  int    `json:"size" form:"size"`
+	Order string `json:"order" form:"order"`
+}

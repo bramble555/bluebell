@@ -43,35 +43,8 @@ func CheckPIDExist(pid int) (bool, error) {
 	}
 	return true, nil
 }
-func GetPostList(page, size int) ([]*models.Post, error) {
-	var posts []*models.Post
-	sqlStr := ` select post_id, user_id, community_id, title, content, create_time
-	from post
-	ORDER BY create_time DESC
-	limit ?, ?
- 	 `
-	rows, err := global.DB.Query(sqlStr, (page-1)*size, size)
-	if err != nil {
-		return nil, err
-	}
-	// 确保关闭数据库查询结果
-	defer rows.Close()
-	for rows.Next() {
-		post := &models.Post{}
-		err := rows.Scan(&post.PostID, &post.UserID, &post.CommunityID, &post.Title, &post.Content, &post.CreateTime)
-		if err != nil {
-			return nil, err
-		}
-		posts = append(posts, post)
-	}
 
-	if err := rows.Err(); err != nil { // 检查循环中的错误
-		return nil, err
-	}
-	return posts, nil
-
-}
-func GetPostList2(idList []string) ([]*models.Post, error) {
+func GetPostList(idList []string) ([]*models.Post, error) {
 	var posts []*models.Post
 	if len(idList) == 0 {
 		return nil, nil
@@ -79,13 +52,12 @@ func GetPostList2(idList []string) ([]*models.Post, error) {
 	// 使用逗号拼接所有元素
 	idInStr := strings.Join(idList, "','")
 	idOrderStr := strings.Join(idList, ",")
-
 	// 构建 SQL 查询
 	sqlStr := fmt.Sprintf(`select post_id, user_id, community_id, title, content, create_time
 	from post
 	where post_id in ('%s')
 	order by FIND_IN_SET(post_id,'%s') 
-	`, idInStr, idOrderStr ) 
+	`, idInStr, idOrderStr)
 	stmt, err := global.DB.Prepare(sqlStr)
 	if err != nil {
 		global.Log.Errorln("db prepare error", err.Error())

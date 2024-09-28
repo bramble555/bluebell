@@ -24,7 +24,7 @@ var (
 )
 
 // CreatePost 创建帖子的时候向redis里面增加 KeyZSetPostTime 和 KeyZSetPostScore
-func CreatePost(postID int) error {
+func CreatePost(postID, communityID int) error {
 	pipe := global.RDB.Pipeline()
 	// 下面增加需要 事务处理
 	pipe.ZAdd(getKeyName(KeyZSetPostTime), redis.Z{
@@ -36,18 +36,48 @@ func CreatePost(postID int) error {
 		Member: postID,
 		Score:  float64(time.Now().Unix()),
 	})
+	// 把 postID 加入到 相应 KeySetCommuntiyPF 里面
+	pipe.SAdd(getKeyName(KeySetCommuntiyPF+strconv.Itoa(communityID)), postID)
 	_, err := pipe.Exec()
 	return err
 }
 
-func GetPostIDList2(ppl *models.ParamPostList) (res []string, err error) {
+func GetPostIDList(ppl *models.ParamPostList) (res []string, err error) {
 	var strat int64 = int64((ppl.Page - 1) * ppl.Size) // 2 1 start: 1*1=1 end: 1+1-1
 	var end int64 = strat + int64(ppl.Size) - 1
 	if ppl.Order == OrderByScore {
-		res, err = global.RDB.ZRange(getKeyName(KeyZSetPostScore), strat, end).Result()
+		res, err = global.RDB.ZRevRange(getKeyName(KeyZSetPostScore), strat, end).Result()
 	} else {
-		res, err = global.RDB.ZRange(getKeyName(KeyZSetPostTime), strat, end).Result()
+		res, err = global.RDB.ZRevRange(getKeyName(KeyZSetPostTime), strat, end).Result()
 	}
+	global.Log.Debugln("id 分别为", res)
+	return res, err
+}
+func GetCommuntiyPostIDList(pcpl *models.ParamCommunityPostList) (res []string, err error) {
+	var strat int64 = int64((pcpl.Page - 1) * pcpl.Size) // 2 1 start: 1*1=1 end: 1+1-1
+	var end int64 = strat + int64(pcpl.Size) - 1
+	// 默认按照时间
+	orderKey := getKeyName(KeyZSetPostTime) // post:time
+	if pcpl.Order == OrderByScore {
+		orderKey = getKeyName(KeyZSetPostScore)
+	}
+	// 社区的key
+	cKey := getKeyName(KeySetCommuntiyPF) + strconv.Itoa(pcpl.ID) // community:id
+	key := getKeyName(orderKey) + ":" + strconv.Itoa(pcpl.ID)     // post:time:id
+	// 60秒存在的话直接取，不存在重新计算
+	if global.RDB.Exists(key).Val() < 1 {
+		pipe := global.RDB.Pipeline()
+		pipe.ZInterStore(key, redis.ZStore{
+			Aggregate: "MAX",
+		}, orderKey, cKey)
+		// 60 秒超时
+		pipe.Expire(key, 60*time.Second)
+		_, err := pipe.Exec()
+		if err != nil {
+			return nil, err
+		}
+	}
+	res, err = global.RDB.ZRange(key, strat, end).Result()
 	global.Log.Debugln("id 分别为", res)
 	return res, err
 }
@@ -76,7 +106,7 @@ func VoteForPost(userID int, postID int, curPos float64) error {
 	// 更新分数和 3 要进行 事务处理
 	pipe := global.RDB.Pipeline()
 	// 更新分数
-	_, err := pipe.ZIncrBy(getKeyName(KeyZSetPostVotedPF+pi), pos*temp*perVoteScore, pi).Result()
+	_, err := pipe.ZIncrBy(getKeyName(KeyZSetPostScore), pos*temp*perVoteScore, pi).Result()
 	if err != nil {
 		return err
 	}

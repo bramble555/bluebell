@@ -26,6 +26,8 @@ func SetupRounter(mode string) *gin.Engine {
 	v1.POST("/post", controllers.CreatePostHandler)
 	v1.GET("/post/:id", controllers.GetPostDetailHandler)
 	v1.GET("/posts", controllers.GetPostListHandler)
+	// 根据社区id获取帖子列表
+	v1.GET("/postsCommun", controllers.GetCommuntiyPostListHandler)
 	v1.POST("/vote", controllers.PostVoteHandler)
 	return r
 }
