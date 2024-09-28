@@ -41,7 +41,7 @@ func CreatePost(postID int) error {
 }
 
 func GetPostIDList2(ppl *models.ParamPostList) (res []string, err error) {
-	var strat int64 = int64((ppl.Page - 1) * ppl.Size) // 3 4 start: 2*4=8 end: 8+4-1=11
+	var strat int64 = int64((ppl.Page - 1) * ppl.Size) // 2 1 start: 1*1=1 end: 1+1-1
 	var end int64 = strat + int64(ppl.Size) - 1
 	if ppl.Order == OrderByScore {
 		res, err = global.RDB.ZRange(getKeyName(KeyZSetPostScore), strat, end).Result()

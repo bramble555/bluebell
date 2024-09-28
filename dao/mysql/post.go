@@ -71,7 +71,7 @@ func GetPostList(page, size int) ([]*models.Post, error) {
 	return posts, nil
 
 }
-func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
+func GetPostList2(idList []string) ([]*models.Post, error) {
 	var posts []*models.Post
 	if len(idList) == 0 {
 		return nil, nil
@@ -85,8 +85,7 @@ func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
 	from post
 	where post_id in ('%s')
 	order by FIND_IN_SET(post_id,'%s') 
-	limit %d,%d
-	`, idInStr, idOrderStr, (page-1)*size, size)
+	`, idInStr, idOrderStr ) 
 	stmt, err := global.DB.Prepare(sqlStr)
 	if err != nil {
 		global.Log.Errorln("db prepare error", err.Error())
@@ -97,7 +96,7 @@ func GetPostList2(idList []string, page, size int) ([]*models.Post, error) {
 		global.Log.Errorln("db query error", err.Error())
 		return nil, err
 	}
-	global.Log.Debugln("idstr为", idOrderStr, "页数为", page, "数量为", size, "(page-1)*size为", (page-1)*size)
+	global.Log.Debugln("idstr为", idOrderStr)
 	defer rows.Close()
 	for rows.Next() {
 		p := &models.Post{}

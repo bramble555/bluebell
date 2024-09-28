@@ -61,37 +61,11 @@ func GetPostDetailHandler(c *gin.Context) {
 	ResponseSucceed(c, pd)
 }
 
-// GetPostListHandler 实现Post列表查询
-func GetPostListHandler(c *gin.Context) {
-	pageStr := c.Query("page")
-	sizeStr := c.Query("size")
-	var page int
-	page64, err := strconv.ParseInt(pageStr, 10, 64)
-	if err != nil {
-		global.Log.Errorln("controller page error", err.Error())
-		page64 = 0
-	}
-	page = int(page64)
-	var size int
-	size64, err := strconv.ParseInt(sizeStr, 10, 64)
-	if err != nil {
-		global.Log.Errorln("controller size error", err.Error())
-		page64 = 2
-	}
-	size = int(size64)
-	data, err := logic.GetPostList(page, size)
-	if err != nil {
-		global.Log.Errorln("logic GetPostList error", err.Error())
-		ResponseError(c, CodeInvalidParam)
-		return
-	}
-	ResponseSucceed(c, data)
-}
 
-// GetPostListHandler2 实现Post列表查询 升级版
+// GetPostListHandler 实现Post列表查询 升级版
 // 根据前端传来的参数动态获取帖子列表
 // 按创建时间排序或者分数排序
-func GetPostListHandler2(c *gin.Context) {
+func GetPostListHandler(c *gin.Context) {
 	// 1. 获取参数
 	ppl := new(models.ParamPostList)
 	defaultPage := 1
@@ -122,7 +96,7 @@ func GetPostListHandler2(c *gin.Context) {
 	// 2. 去redis查询id列表
 	// 3. 根据id去数据库查询帖子详情
 	// 2 和 3 都在logic去做
-	data, err := logic.GetPostList2(ppl)
+	data, err := logic.GetPostList(ppl)
 	if err != nil {
 		global.Log.Error("logic GetPostList error", err.Error())
 		ResponseError(c, CodeServerBusy)

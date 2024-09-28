@@ -15,7 +15,8 @@ type Post struct {
 
 type PostDetail struct {
 	Username    string  `json:"user_name"`
-	ApprovalNum []int64 `json:"approval_num"`
+	ApprovalNum int64 `json:"approval_num"`
 	*Post
-	*CommunityDetail
+	CommunityName         string `json:"community_name" db:"community_name"`
+	CommunityIntroduction string `json:"introduction,omitempty" db:"introduction"`
 }

@@ -39,8 +39,8 @@ func GetPostDetail(p *models.Post) (*models.PostDetail, error) {
 		global.Log.Errorf("logic GetCommunityDetailByID err community_id是 %d: %v", p.CommunityID, err)
 		return nil, err
 	}
-	pd.CommunityDetail = cd
-
+	pd.CommunityIntroduction = cd.Introduction
+	pd.CommunityName = cd.Name
 	// 获取用户详情
 	ud, err := mysql.GetUserDetail(p.UserID)
 	if err != nil {
@@ -52,37 +52,7 @@ func GetPostDetail(p *models.Post) (*models.PostDetail, error) {
 	return pd, nil
 }
 
-func GetPostList(page, size int) ([]*models.PostDetail, error) {
-	posts, err := mysql.GetPostList(page, size)
-	pds := make([]*models.PostDetail, 0, len(posts))
-	if err != nil {
-		return nil, err
-	}
-	for _, p := range posts {
-		pd := &models.PostDetail{
-			Username:        "",
-			Post:            p,
-			CommunityDetail: &models.CommunityDetail{},
-		}
-		// 获取社区详情
-		cd, err := mysql.GetCommunityDetailByID(p.CommunityID)
-		if err != nil {
-			global.Log.Errorf("logic GetCommunityDetailByID err community_id是 %d: %v", p.CommunityID, err)
-			return nil, err
-		}
-		pd.CommunityDetail = cd
-		// 获取用户详情
-		ud, err := mysql.GetUserDetail(p.UserID)
-		if err != nil {
-			global.Log.Errorf("logic GetUserDetail err user_id是 %d: %v", p.UserID, err)
-			return nil, err
-		}
-		pd.Username = ud.Username
-		pds = append(pds, pd)
-	}
-	return pds, nil
-}
-func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
+func GetPostList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 	idList, err := redis.GetPostIDList2(ppl)
 	if err != nil {
 		global.Log.Errorf("redis GetPostIDList2 error %s\n", err.Error())
@@ -94,7 +64,7 @@ func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
 		return nil, err
 	}
-	posts, err := mysql.GetPostList2(idList, ppl.Page, ppl.Size)
+	posts, err := mysql.GetPostList2(idList)
 	pds := make([]*models.PostDetail, 0, len(idList))
 	global.Log.Debugln("idList长度为", len(idList))
 	if err != nil {
@@ -102,12 +72,13 @@ func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 		return nil, err
 	}
 	global.Log.Debugln("posts为", posts)
-	for _, p := range posts {
+	for i, p := range posts {
 		pd := &models.PostDetail{
-			Username:        "",
-			Post:            p,
-			CommunityDetail: &models.CommunityDetail{},
-			ApprovalNum:     approvalNum,
+			Username:              "",
+			Post:                  p,
+			ApprovalNum:           approvalNum[i],
+			CommunityName:         "",
+			CommunityIntroduction: "",
 		}
 		// 获取社区详情
 		cd, err := mysql.GetCommunityDetailByID(p.CommunityID)
@@ -115,7 +86,8 @@ func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 			global.Log.Errorf("logic GetCommunityDetailByID err community_id是 %d: %v", p.CommunityID, err)
 			return nil, err
 		}
-		pd.CommunityDetail = cd
+		pd.CommunityIntroduction = cd.Introduction
+		pd.CommunityName = cd.Name
 		// 获取用户详情
 		ud, err := mysql.GetUserDetail(p.UserID)
 		if err != nil {
@@ -127,7 +99,6 @@ func GetPostList2(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 		pds = append(pds, pd)
 	}
 	return pds, nil
-
 }
 
 // 投票有很多算法
