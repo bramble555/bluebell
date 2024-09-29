@@ -64,7 +64,7 @@ func GetPostList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
 		return nil, err
 	}
-	posts, err := mysql.GetPostList(idList)
+	posts, err := mysql.GetPostList(idList, ppl)
 	pds := make([]*models.PostDetail, 0, len(idList))
 	global.Log.Debugln("idList长度为", len(idList))
 	if err != nil {
@@ -100,8 +100,8 @@ func GetPostList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
 	}
 	return pds, nil
 }
-func GetPostCommunityList(pcpl *models.ParamCommunityPostList) ([]*models.PostDetail, error) {
-	idList, err := redis.GetCommuntiyPostIDList(pcpl)
+func GetPostCommunityList(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
+	idList, err := redis.GetCommuntiyPostIDList(ppl)
 	if err != nil {
 		global.Log.Errorf("redis GetPostIDList2 error %s\n", err.Error())
 		return nil, err
@@ -112,7 +112,7 @@ func GetPostCommunityList(pcpl *models.ParamCommunityPostList) ([]*models.PostDe
 		global.Log.Errorf("redis GetPostApproNum error %s\n", err.Error())
 		return nil, err
 	}
-	posts, err := mysql.GetPostList(idList)
+	posts, err := mysql.GetPostList(idList, ppl)
 	pds := make([]*models.PostDetail, 0, len(idList))
 	global.Log.Debugln("idList长度为", len(idList))
 	if err != nil {
@@ -147,6 +147,15 @@ func GetPostCommunityList(pcpl *models.ParamCommunityPostList) ([]*models.PostDe
 		pds = append(pds, pd)
 	}
 	return pds, nil
+}
+func GetPostListFit(ppl *models.ParamPostList) ([]*models.PostDetail, error) {
+	if ppl.ID == 0 {
+		global.Log.Debugf("community_id为:%d", ppl.ID)
+		return GetPostList(ppl)
+	} else {
+		global.Log.Debugf("community_id为:%d", ppl.ID)
+		return GetPostCommunityList(ppl)
+	}
 }
 
 // 投票有很多算法

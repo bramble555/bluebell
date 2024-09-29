@@ -44,7 +44,7 @@ func CheckPIDExist(pid int) (bool, error) {
 	return true, nil
 }
 
-func GetPostList(idList []string) ([]*models.Post, error) {
+func GetPostList(idList []string, ppl *models.ParamPostList) ([]*models.Post, error) {
 	var posts []*models.Post
 	if len(idList) == 0 {
 		return nil, nil
@@ -53,11 +53,22 @@ func GetPostList(idList []string) ([]*models.Post, error) {
 	idInStr := strings.Join(idList, "','")
 	idOrderStr := strings.Join(idList, ",")
 	// 构建 SQL 查询
-	sqlStr := fmt.Sprintf(`select post_id, user_id, community_id, title, content, create_time
+	// communtiyID 为 0 的时候，在 mysql 里面限制 page 和 size
+	var sqlStr string
+	if ppl.ID != 0 {
+		sqlStr = fmt.Sprintf(`select post_id, user_id, community_id, title, content, create_time
+		from post
+		where post_id in ('%s')
+		order by FIND_IN_SET(post_id,'%s')
+		limit %d, %d
+		`, idInStr, idOrderStr, (ppl.Page-1)*ppl.Size, ppl.Size)
+	} else {
+		sqlStr = fmt.Sprintf(`select post_id, user_id, community_id, title, content, create_time
 	from post
 	where post_id in ('%s')
 	order by FIND_IN_SET(post_id,'%s') 
 	`, idInStr, idOrderStr)
+	}
 	stmt, err := global.DB.Prepare(sqlStr)
 	if err != nil {
 		global.Log.Errorln("db prepare error", err.Error())

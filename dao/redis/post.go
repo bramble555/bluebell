@@ -53,17 +53,16 @@ func GetPostIDList(ppl *models.ParamPostList) (res []string, err error) {
 	global.Log.Debugln("id 分别为", res)
 	return res, err
 }
-func GetCommuntiyPostIDList(pcpl *models.ParamCommunityPostList) (res []string, err error) {
-	var strat int64 = int64((pcpl.Page - 1) * pcpl.Size) // 2 1 start: 1*1=1 end: 1+1-1
-	var end int64 = strat + int64(pcpl.Size) - 1
+func GetCommuntiyPostIDList(ppl *models.ParamPostList) (res []string, err error) {
+	
 	// 默认按照时间
 	orderKey := getKeyName(KeyZSetPostTime) // post:time
-	if pcpl.Order == OrderByScore {
+	if ppl.Order == OrderByScore {
 		orderKey = getKeyName(KeyZSetPostScore)
 	}
 	// 社区的key
-	cKey := getKeyName(KeySetCommuntiyPF) + strconv.Itoa(pcpl.ID) // community:id
-	key := getKeyName(orderKey) + ":" + strconv.Itoa(pcpl.ID)     // post:time:id
+	cKey := getKeyName(KeySetCommuntiyPF) + strconv.Itoa(ppl.ID) // community:id
+	key := getKeyName(orderKey) + ":" + strconv.Itoa(ppl.ID)     // post:time:id
 	// 60秒存在的话直接取，不存在重新计算
 	if global.RDB.Exists(key).Val() < 1 {
 		pipe := global.RDB.Pipeline()
@@ -77,7 +76,7 @@ func GetCommuntiyPostIDList(pcpl *models.ParamCommunityPostList) (res []string, 
 			return nil, err
 		}
 	}
-	res, err = global.RDB.ZRange(key, strat, end).Result()
+	res, err = global.RDB.SMembers(cKey).Result()
 	global.Log.Debugln("id 分别为", res)
 	return res, err
 }

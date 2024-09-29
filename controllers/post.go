@@ -28,6 +28,12 @@ func CreatePostHandler(c *gin.Context) {
 		ResponseError(c, CodeNeedLogin)
 		return
 	}
+	// 参数判断 communtiy_id (目前只有1-4)
+	if p.CommunityID < 1 || p.CommunityID > 4 {
+		global.Log.Errorf("logic CreatePost err: %s", "community_id参数错误")
+		ResponseErrorWithData(c, CodeInvalidParam, "community_id参数错误")
+		return
+	}
 	err = logic.CreatePost(p)
 	if err != nil {
 		global.Log.Errorln("logic CreatePost err", err.Error())
@@ -61,78 +67,34 @@ func GetPostDetailHandler(c *gin.Context) {
 	ResponseSucceed(c, pd)
 }
 
-// GetPostListHandler 实现Post列表查询 升级版
-// 根据前端传来的参数动态获取帖子列表
-// 按创建时间排序或者分数排序
-func GetPostListHandler(c *gin.Context) {
-	// 1. 获取参数
-	ppl := new(models.ParamPostList)
-	defaultPage := 1
-	defaultSize := 10
-	defaultOrder := redis.OrderByTime // 默认按时间排序
-	// 设置默认值
-	ppl.Page = defaultPage
-	ppl.Size = defaultSize
-	ppl.Order = defaultOrder
-	// 从URL获取参数
-	err := c.ShouldBindQuery(&ppl)
-	if err != nil {
-		global.Log.Errorf("controller GetPostListHandler2 error: %v", err)
-		ResponseErrorWithData(c, CodeInvalidParam, err.Error())
-		return
-	}
-
-	// 验证参数
-	if ppl.Page <= 0 {
-		ppl.Page = defaultPage
-	}
-	if ppl.Size <= 0 {
-		ppl.Size = defaultSize
-	}
-	if ppl.Order == "" {
-		ppl.Order = defaultOrder
-	}
-	// 2. 去redis查询id列表
-	// 3. 根据id去数据库查询帖子详情
-	// 2 和 3 都在logic去做
-	data, err := logic.GetPostList(ppl)
-	if err != nil {
-		global.Log.Error("logic GetPostList error", err.Error())
-		ResponseError(c, CodeServerBusy)
-		return
-	}
-	// 返回响应
-	ResponseSucceed(c, data)
-
-}
-
-func GetCommuntiyPostListHandler(c *gin.Context) {
-	// ParamCommunityPostList 默认值
-	pcpl := &models.ParamCommunityPostList{
+// GetPostListFitHandler 获取帖子
+func GetPostListFitHandler(c *gin.Context) {
+	// ParamPostList 默认值
+	ppl := &models.ParamPostList{
 		ID:    0,
 		Page:  1,
 		Size:  10,
 		Order: redis.OrderByTime,
 	}
-	err := c.ShouldBindQuery(&pcpl)
+	err := c.ShouldBindQuery(&ppl)
 	if err != nil {
-		global.Log.Errorf("controller GetCommuntiyPostListHandler error: %v", err)
+		global.Log.Errorf("controller GetPostListFitHandler error: %v", err)
 		ResponseErrorWithData(c, CodeInvalidParam, err.Error())
 		return
 	}
 	// 参数校验
-	if pcpl.Page <= 0 {
-		pcpl.Page = 1
+	if ppl.Page <= 0 {
+		ppl.Page = 1
 	}
-	if pcpl.Size <= 0 {
-		pcpl.Size = 10
+	if ppl.Size <= 0 {
+		ppl.Size = 10
 	}
-	if pcpl.Order == "" {
-		pcpl.Order = redis.OrderByTime
+	if ppl.Order == "" {
+		ppl.Order = redis.OrderByTime
 	}
-	data, err := logic.GetPostCommunityList(pcpl)
+	data, err := logic.GetPostListFit(ppl)
 	if err != nil {
-		global.Log.Error("logic GetPostCommunityList error", err.Error())
+		global.Log.Error("logic GetPostListFit error", err.Error())
 		ResponseError(c, CodeServerBusy)
 		return
 	}
