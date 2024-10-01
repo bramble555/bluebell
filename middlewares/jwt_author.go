@@ -1,11 +1,13 @@
 package middlewares
 
 import (
-	"strings"
 	"bluebell/controllers"
 	"bluebell/pkg/jwt"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/juju/ratelimit"
 )
 
 func JWTAuthorMiddleware() func(c *gin.Context) {
@@ -36,5 +38,16 @@ func JWTAuthorMiddleware() func(c *gin.Context) {
 		// 将当前请求的userID信息保存到请求的上下文c上
 		c.Set(controllers.CtxUserIDKey, mc.UserID)
 		c.Next() // 后续的处理函数可以用过c.Get(controllers.CtxUserIDKey)来获取当前请求的用户信息
+	}
+}
+func RateLimitMiddleware(fillInterval time.Duration, capacity int64) func(c *gin.Context) {
+	bucket := ratelimit.NewBucket(fillInterval, capacity)
+	return func(c *gin.Context) {
+		if bucket.Take(1) > 0 {
+			c.String(200, "rete limit...")
+			c.Abort()
+			return
+		}
+		c.Next()
 	}
 }
