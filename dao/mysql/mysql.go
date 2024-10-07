@@ -13,7 +13,7 @@ import (
 
 func Init() (db *sql.DB, err error) {
 	// 连接字符串，也就是数据源
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local",
+	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
 		viper.GetString("mysql.user"),
 		viper.GetString("mysql.password"),
 		viper.GetString("mysql.host"),

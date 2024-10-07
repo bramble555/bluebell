@@ -5,6 +5,7 @@ import (
 	"bluebell/middlewares"
 	"time"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,5 +32,6 @@ func SetupRounter(mode string) *gin.Engine {
 	v1.GET("/post/:id", controllers.GetPostDetailHandler)
 	v1.GET("/posts", controllers.GetPostListFitHandler)
 	v1.POST("/vote", controllers.PostVoteHandler)
+	pprof.Register(r)
 	return r
 }

@@ -1,7 +1,7 @@
 app:
   name: "bluebell"
   mode: "dev"
-  port: "8080"
+  port: "8888"
   version: "v0.0.1"
 
 log: 
@@ -12,15 +12,14 @@ log:
 
 mysql:
   host: "127.0.0.1"
-  port: "3306"
+  port: "13306"
   user: "root"
   password: "123456"
   dbname: "bluebell"
 
-# redis未写
 redis: 
   host: "127.0.0.1"
-  port: "6379"
-  password : "123456"
+  port: "26379"
+  password: ""
   db: 0
   pool_size: 100
