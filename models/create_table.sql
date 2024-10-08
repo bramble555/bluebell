@@ -1,4 +1,5 @@
-CREATE TABLE `user` (
+CREATE DATABASE IF NOT EXISTS bluebell;
+CREATE TABLE  IF NOT exists `user`(
 	`id` BIGINT ( 20 ) NOT NULL auto_increment,-- 防止用户知道我这个项目有多少人注册了
 	`user_id` BIGINT ( 20 ) NOT NULL,
 	`username` VARCHAR ( 64 ) NOT NULL,
@@ -12,7 +13,7 @@ CREATE TABLE `user` (
 	UNIQUE KEY `idx_user_id` ( `user_id` ) USING BTREE
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE `community`(
+CREATE TABLE IF NOT exists `community`(
 	`id` BIGINT ( 20 ) NOT NULL auto_increment,-- 防止用户知道我这个项目有多少人注册了
 	`community_id` BIGINT ( 20 ) NOT NULL,
 	`community_name` VARCHAR ( 128 ) NOT NULL,
@@ -33,7 +34,7 @@ VALUES (3,'LOL','欢迎来到影响联盟');
 INSERT INTO `community` (`community_id`,community_name,introduction)
 VALUES (4,'CF','A小有人');
 
-CREATE TABLE `post` (
+CREATE TABLE IF NOT exists `post` (
 	`id` BIGINT ( 20 ) NOT NULL auto_increment,
 	`post_id` BIGINT(20) not null,
 	`title` VARCHAR(128) not null,

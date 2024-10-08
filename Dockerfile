@@ -16,7 +16,7 @@ RUN go build -o bluebell_app .
 
 # 接下来创建一个小镜像
 FROM debian:stretch-slim
-COPY ./wait-for-it.sh /wait-for-it.sh
+COPY ./wait-for.sh /wait-for.sh
 # 复制config.yaml文件 如果还有静态文件也复制静态文件
 COPY ./conf /conf
 # 把二进制文件从 builder 复制到 /
