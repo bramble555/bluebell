@@ -19,7 +19,7 @@
 - JWT(JSON Web Token) 进行认证
 4. 初步会编写 Makefile 文件 (本质就是很多命令简化)
 5. 初步会编写 Dockerfile 和 docker-compose.yaml (代码连接 MySQL 的时候端口是容器中的端口)
-6. ab 测压工具  (-n 请求个数 -c 并发量 -t 多少s)
+6. ab 压侧工具  (-n 请求个数 -c 并发量 -t 多少s)
 ``` 
 $ ab -n 1000 -c 50 -t 10 URL
 ```
@@ -31,4 +31,4 @@ $ ab -n 1000 -c 50 -t 10 URL
 [![drawio.png](https://i.postimg.cc/hjN6B45C/drawio.png)](https://postimg.cc/ygXvhKB9)
 ## to do  未实现
 - 返回前端没有进行validator，返回的是英文
-- 
+
