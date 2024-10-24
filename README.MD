@@ -28,6 +28,7 @@ $ ab -n 1000 -c 50 -t 10 URL
 9. air 热加载
 
 ## MySql EER picture
-![Alt](https://i.postimg.cc/hjN6B45C/drawio.png)
+[![drawio.png](https://i.postimg.cc/hjN6B45C/drawio.png)](https://postimg.cc/ygXvhKB9)
 ## to do  未实现
 - 返回前端没有进行validator，返回的是英文
+- 
