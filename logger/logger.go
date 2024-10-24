@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"bluebell/global"
 	"bytes"
 	"fmt"
 	"io"
@@ -111,7 +112,7 @@ func Init() (mLog *logrus.Logger, err error) {
 	// 格式
 	mLog.SetFormatter(&LogFormatter{})
 	// 解析level
-	level, err := logrus.ParseLevel(viper.GetString("log.level"))
+	level, err := logrus.ParseLevel(global.Log.Level.String())
 	if err != nil {
 		level = logrus.InfoLevel
 	}

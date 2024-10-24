@@ -25,9 +25,9 @@ $ ab -n 1000 -c 50 -t 10 URL
 ```
 7. pprof 性能分析 (cpu memory...)
 8. redis 一些操作，如 计算多个有序集合的交集
+9. air 热加载
 
 ## MySql EER picture
 ![Alt](https://i.postimg.cc/hjN6B45C/drawio.png)
 ## to do  未实现
 - 返回前端没有进行validator，返回的是英文
-- air 热加载
